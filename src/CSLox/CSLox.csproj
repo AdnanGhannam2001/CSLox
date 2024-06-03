@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CSLox.Core\CSLox.Core.csproj" />
+    <ProjectReference Include="..\CSLox.Scanning\CSLox.Scanning.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
