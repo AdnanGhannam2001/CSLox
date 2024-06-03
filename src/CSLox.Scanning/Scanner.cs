@@ -106,7 +106,7 @@ public sealed class Scanner
     }
 
     private static bool IsDigit(char c) => c >= '0' && c <= '9';
-    private static bool IsAlpha(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    private static bool IsAlpha(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
     private static bool IsAlphaNumeric(char c) => IsDigit(c) || IsAlpha(c);
 
     private void ScanString()
@@ -121,7 +121,7 @@ public sealed class Scanner
         if (IsAtEnd) throw new ScannerException(CurrentToken, _line, _start, _current);
 
         _current++;
-        AddToken(STRING, double.Parse(CurrentToken));
+        AddToken(STRING, CurrentToken);
     }
 
     private void ScanNumber()
@@ -134,7 +134,7 @@ public sealed class Scanner
             else _current--;
         }
 
-        AddToken(NUMBER, CurrentToken);
+        AddToken(NUMBER, double.Parse(CurrentToken));
     }
 
     private void ScanIdentifer()
