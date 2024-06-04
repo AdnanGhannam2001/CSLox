@@ -1,0 +1,26 @@
+using System.Text;
+using CSLox.Scanning;
+
+namespace CSLox.Parsing.Grammar;
+
+public record Unary(Token Operator, Expr Expression) : Expr
+{
+    internal override (int, string) Draw()
+    {
+        var currentCounter = ++s_counter;
+
+        var sb = new StringBuilder();
+
+        sb.Append($"subgraph cluster_{s_counter}");
+        sb.Append('{');
+            sb.Append($"label=\"Unary\";");
+            sb.Append($"expr_{s_counter}[label=\"{Operator.Lexeme}\"];");
+
+            var (exprCounter, content) = Expression.Draw();
+            sb.Append($"expr_{currentCounter}->expr_{exprCounter};");
+            sb.Append(content);
+        sb.Append('}');
+
+        return (currentCounter, sb.ToString());
+    }
+}
