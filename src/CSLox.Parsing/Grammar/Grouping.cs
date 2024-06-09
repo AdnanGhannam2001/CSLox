@@ -22,4 +22,9 @@ public record Grouping(Expr Expression) : Expr
 
         return (currentCounter, sb.ToString());
     }
+
+    public override object Interpret()
+    {
+        return Expression.Interpret();
+    }
 }

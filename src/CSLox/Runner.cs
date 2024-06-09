@@ -16,6 +16,7 @@ public static class Runner
         // Parsing
         var parser = new Parser(tokens);
         var expr = parser.Parse();
+        Logger.LogMessage("Result = ", expr.Interpret().ToString());
 
 #if DEBUG
         foreach (var token in tokens)

@@ -19,4 +19,9 @@ public record Literal(object Value) : Expr
 
         return (s_counter, sb.ToString());
     }
+
+    public override object Interpret()
+    {
+        return Value;
+    }
 }

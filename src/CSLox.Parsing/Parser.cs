@@ -100,7 +100,7 @@ public sealed class Parser
     {
         if (MatchesAny(TRUE)) return new Literal(true);
         if (MatchesAny(FALSE)) return new Literal(false);
-        if (MatchesAny(NUMBER) || MatchesAny(STRING)) return new Literal(_tokens.ElementAt(_current - 1).Lexeme);
+        if (MatchesAny(NUMBER) || MatchesAny(STRING)) return new Literal(_tokens.ElementAt(_current - 1).Literal!);
 
         if (MatchesAny(LEFT_PAREN))
         {
