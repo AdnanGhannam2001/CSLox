@@ -1,4 +1,5 @@
-﻿using CSLox.Parsing.Exceptions;
+﻿using System.Diagnostics;
+using CSLox.Parsing.Exceptions;
 using CSLox.Parsing.Grammar;
 using CSLox.Scanning;
 using CSLox.Scanning.Enums;
@@ -18,14 +19,81 @@ public sealed class Parser
         _tokens = tokens;
     }
 
-    public Expr Parse()
+    public IEnumerable<Statement> Parse()
     {
-        return Expression();
+        var statements = new List<Statement>();
+
+        while (!IsAtEnd)
+        {
+            statements.Add(Declaration());
+        }
+
+        return statements;
+    }
+
+    private Statement Declaration()
+    {
+        if (MatchesAny(VAR)) return VarDeclaration();
+
+        return Statement();
+    }
+
+    private Statement VarDeclaration()
+    {
+        var identifier = Consume(IDENTIFIER);
+
+        var initExpr = MatchesAny(EQUAL) ? Expression() : null;
+
+        Consume(SEMICOLON);
+
+        return new VarDeclaration(identifier, initExpr);
+    }
+
+    private Statement Statement()
+    {
+        if (MatchesAny(PRINT)) return PrintStatement();
+
+        return ExpressionStatement();
+    }
+
+    private Statement PrintStatement()
+    {
+        var expr = Expression();
+        Consume(SEMICOLON);
+        return new PrintStatement(expr);
+    }
+
+    private Statement ExpressionStatement()
+    {
+        var expr = Expression();
+        Consume(SEMICOLON);
+        return new ExpressionStatement(expr);
     }
 
     private Expr Expression()
     {
-        return Equality();
+        return Assignment();
+    }
+
+    private Expr Assignment()
+    {
+        var expr = Equality();
+
+        if (MatchesAny(EQUAL))
+        {
+            var assignment = Assignment();
+
+            var variable = expr as Variable;
+
+            if (variable is null)
+            {
+                throw new RuntimeException("Invalid assignment");
+            }
+
+            return new Assignment(variable.Identifier, assignment);
+        }
+
+        return expr;
     }
 
     private Expr Equality()
@@ -109,6 +177,8 @@ public sealed class Parser
             return new Grouping(expr);
         }
 
+        if (MatchesAny(IDENTIFIER)) return new Variable(_tokens.ElementAt(_current - 1));
+
         throw new UnexpectedTokenException(CurrentToken, "Excpected expression");
     }
 
@@ -134,6 +204,6 @@ public sealed class Parser
     {
         if (MatchesAny(type)) return _tokens.ElementAt(_current - 1);
 
-        throw new UnexpectedTokenException(CurrentToken, $"Excpected {type} instead");
+        throw new UnexpectedTokenException(CurrentToken, $"Excpected {type} at the end");
     }
 }

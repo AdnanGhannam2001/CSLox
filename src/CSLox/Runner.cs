@@ -15,17 +15,19 @@ public static class Runner
 
         // Parsing
         var parser = new Parser(tokens);
-        var expr = parser.Parse();
-        Logger.LogMessage("Result = ", expr.Interpret().ToString());
+        var program = parser.Parse();
 
-#if DEBUG
+#if PRINT_TOKENS
         foreach (var token in tokens)
         {
             Logger.LogMessage(token.ToString());
         }
-
-        Logger.LogInfo("AST", expr.Display());
 #endif
+
+        foreach (var statement in program)
+        {
+            statement.Interpret();
+        }
     }
 
     public static void RunFile(string path)
