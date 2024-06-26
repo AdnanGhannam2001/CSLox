@@ -7,7 +7,7 @@ public record Assignment(Token Name, Expr Value) : Expr
     public override object Interpret()
     {
         var value = Value.Interpret();
-        Environment.Assign(Name.Lexeme, Value.Interpret());
+        Parser.s_environment.Assign(Name.Lexeme, Value.Interpret());
         return value;
     }
 

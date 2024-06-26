@@ -5,10 +5,9 @@ namespace CSLox.Parsing.Grammar;
 
 public record Variable(Token Identifier) : Expr
 {
-    // TODO try to fix this
     public override object Interpret()
     {
-        return Environment.GetVariableValue(Identifier.Lexeme);
+        return Parser.s_environment.GetVariableValue(Identifier.Lexeme)!;
     }
 
     internal override (int counter, string content) Draw()

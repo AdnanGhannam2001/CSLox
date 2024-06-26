@@ -6,6 +6,6 @@ public record VarDeclaration(Token Name, Expr? Initializer = null) : Statement
 {
     public override void Interpret()
     {
-        Environment.Decalare(Name.Lexeme, Initializer?.Interpret());
+        Parser.s_environment.Decalare(Name.Lexeme, Initializer?.Interpret());
     }
 }

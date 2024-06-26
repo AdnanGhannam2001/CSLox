@@ -1,3 +1,3 @@
 #!/bin/bash
 
-dotnet run --project ./src/CSLox -- "$@"
+dotnet run --project ./src/CSLox "$@"

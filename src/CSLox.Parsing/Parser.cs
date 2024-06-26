@@ -7,7 +7,7 @@ using static CSLox.Scanning.Enums.TokenType;
 
 namespace CSLox.Parsing;
 
-public sealed class Parser
+public sealed partial class Parser
 {
     private readonly IEnumerable<Token> _tokens;
     private int _current = 0;
@@ -52,6 +52,7 @@ public sealed class Parser
     private Statement Statement()
     {
         if (MatchesAny(PRINT)) return PrintStatement();
+        if (MatchesAny(LEFT_BRACE)) return new Block(Block());
 
         return ExpressionStatement();
     }
@@ -61,6 +62,23 @@ public sealed class Parser
         var expr = Expression();
         Consume(SEMICOLON);
         return new PrintStatement(expr);
+    }
+
+    private IList<Statement> Block()
+    {
+        var statements = new List<Statement>();
+
+        while (!MatchesAny(RIGHT_BRACE))
+        {
+            if (IsAtEnd)
+            {
+                throw new RuntimeException("Excpected '}'");
+            }
+
+            statements.Add(Declaration());
+        }
+
+        return statements;
     }
 
     private Statement ExpressionStatement()

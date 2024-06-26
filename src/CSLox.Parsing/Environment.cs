@@ -2,35 +2,53 @@ using CSLox.Parsing.Exceptions;
 
 namespace CSLox.Parsing;
 
-internal static class Environment
+public sealed partial class Parser
 {
-    private static readonly Dictionary<string, object?> Declarations = [];
-
-    public static void Decalare(string name, object? value)
+    internal static Environment s_environment = new();
+    
+    internal class Environment
     {
-        if (Declarations.ContainsKey(name))
+        private readonly Dictionary<string, object?> _declarations = [];
+        public Environment? m_environment;
+
+        public Environment() { }
+
+        public Environment(Environment environment)
         {
-            Declarations[name] = value;
-            return;
+            m_environment = environment;
         }
 
-        Declarations.Add(name, value);
-    }
-
-    public static void Assign(string name, object value)
-    {
-        if (!Declarations.ContainsKey(name))
+        public void Decalare(string name, object? value)
         {
+            if (_declarations.ContainsKey(name))
+            {
+                _declarations[name] = value;
+                return;
+            }
+
+            _declarations.Add(name, value);
+        }
+
+        public void Assign(string name, object value)
+        {
+            if (_declarations.ContainsKey(name))
+            {
+                _declarations[name] = value;
+                return;
+            }
+
+            if (m_environment is not null) m_environment.Assign(name, value);
+
             throw new RuntimeException($"Undefined variable named: {name}");
         }
 
-        Declarations[name] = value;
-    }
+        public object? GetVariableValue(string name)
+        {
+            if (_declarations.TryGetValue(name, out var value)) return value;
 
-    public static object? GetVariableValue(string name)
-    {
-        if (Declarations.TryGetValue(name, out var value)) return value;
+            if (m_environment is not null) return m_environment.GetVariableValue(name);
 
-        throw new RuntimeException($"Undefined variable named: {name}");
+            throw new RuntimeException($"Undefined variable named: '{name}'");
+        }
     }
 }
