@@ -43,11 +43,4 @@ public record Unary(Token Operator, Expr Expression) : Expr
 
         throw new UnreachableException();
     }
-
-    private static bool Truthy(object? obj)
-    {
-        if (obj is null) return false;
-        if (obj is bool b) return b;
-        return true;
-    }
 }

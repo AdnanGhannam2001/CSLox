@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using CSLox.Parsing.Exceptions;
+﻿using CSLox.Parsing.Exceptions;
 using CSLox.Parsing.Grammar;
 using CSLox.Scanning;
 using CSLox.Scanning.Enums;
@@ -53,6 +52,7 @@ public sealed partial class Parser
     {
         if (MatchesAny(PRINT)) return PrintStatement();
         if (MatchesAny(LEFT_BRACE)) return new Block(Block());
+        if (MatchesAny(IF)) return IfStatement();
 
         return ExpressionStatement();
     }
@@ -81,6 +81,23 @@ public sealed partial class Parser
         return statements;
     }
 
+    private Statement IfStatement()
+    {
+        Consume(LEFT_PAREN);
+        var condition = Expression();
+        Consume(RIGHT_PAREN);
+
+        var then = Statement();
+
+        Statement? @else = null;
+        if (MatchesAny(ELSE))
+        {
+            @else = Statement();
+        }
+
+        return new IfStatement(condition, then, @else);
+    }
+
     private Statement ExpressionStatement()
     {
         var expr = Expression();
@@ -95,7 +112,7 @@ public sealed partial class Parser
 
     private Expr Assignment()
     {
-        var expr = Equality();
+        var expr = Or();
 
         if (MatchesAny(EQUAL))
         {
@@ -109,6 +126,34 @@ public sealed partial class Parser
             }
 
             return new Assignment(variable.Identifier, assignment);
+        }
+
+        return expr;
+    }
+
+    private Expr Or()
+    {
+        var expr = And();
+
+        while (MatchesAny(OR))
+        {
+            var op = _tokens.ElementAt(_current - 1);
+            var right = Equality();
+            expr = new Logical(expr, op, right);
+        }
+
+        return expr;
+    }
+
+    private Expr And()
+    {
+        var expr = Equality();
+
+        while (MatchesAny(AND))
+        {
+            var op = _tokens.ElementAt(_current - 1);
+            var right = Equality();
+            expr = new Logical(expr, op, right);
         }
 
         return expr;
@@ -186,6 +231,7 @@ public sealed partial class Parser
     {
         if (MatchesAny(TRUE)) return new Literal(true);
         if (MatchesAny(FALSE)) return new Literal(false);
+        if (MatchesAny(NIL)) return new Literal(null);
         if (MatchesAny(NUMBER) || MatchesAny(STRING)) return new Literal(_tokens.ElementAt(_current - 1).Literal!);
 
         if (MatchesAny(LEFT_PAREN))

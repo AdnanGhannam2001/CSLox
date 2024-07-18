@@ -2,8 +2,10 @@ using System.Text;
 
 namespace CSLox.Parsing.Grammar;
 
-public record Literal(object Value) : Expr
+public record Literal(object? Value) : Expr
 {
+    public struct NULL;
+
     internal override (int, string) Draw()
     {
         s_counter++;
@@ -22,6 +24,6 @@ public record Literal(object Value) : Expr
 
     public override object Interpret()
     {
-        return Value;
+        return Value ?? new NULL();
     }
 }
