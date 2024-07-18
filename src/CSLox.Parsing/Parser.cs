@@ -53,6 +53,7 @@ public sealed partial class Parser
         if (MatchesAny(PRINT)) return PrintStatement();
         if (MatchesAny(LEFT_BRACE)) return new Block(Block());
         if (MatchesAny(IF)) return IfStatement();
+        if (MatchesAny(WHILE)) return WhileStatement();
 
         return ExpressionStatement();
     }
@@ -96,6 +97,17 @@ public sealed partial class Parser
         }
 
         return new IfStatement(condition, then, @else);
+    }
+
+    private Statement WhileStatement()
+    {
+        Consume(LEFT_PAREN);
+        var condition = Expression();
+        Consume(RIGHT_PAREN);
+
+        var statement = Statement();
+
+        return new WhileStatement(condition, statement);
     }
 
     private Statement ExpressionStatement()

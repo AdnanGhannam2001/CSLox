@@ -37,7 +37,11 @@ public sealed partial class Parser
                 return;
             }
 
-            if (m_environment is not null) m_environment.Assign(name, value);
+            if (m_environment is not null)
+            {
+                m_environment.Assign(name, value);
+                return;
+            }
 
             throw new RuntimeException($"Undefined variable named: {name}");
         }
