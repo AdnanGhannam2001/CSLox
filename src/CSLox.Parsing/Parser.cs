@@ -50,10 +50,11 @@ public sealed partial class Parser
 
     private Statement Statement()
     {
-        if (MatchesAny(PRINT)) return PrintStatement();
-        if (MatchesAny(LEFT_BRACE)) return new Block(Block());
+        if (MatchesAny(FOR)) return ForStatement();
         if (MatchesAny(IF)) return IfStatement();
+        if (MatchesAny(PRINT)) return PrintStatement();
         if (MatchesAny(WHILE)) return WhileStatement();
+        if (MatchesAny(LEFT_BRACE)) return new Block(Block());
 
         return ExpressionStatement();
     }
@@ -82,6 +83,37 @@ public sealed partial class Parser
         return statements;
     }
 
+    private Statement ForStatement()
+    {
+        Consume(LEFT_PAREN);
+        Statement? init = null;
+
+        if (!MatchesAny(SEMICOLON))
+        {
+            init = MatchesAny(VAR) ? VarDeclaration() : ExpressionStatement();
+        }
+
+        Console.WriteLine(1);
+
+        Expr? condition = null;
+        if (!MatchesAny(SEMICOLON))
+        {
+            condition = Expression();
+            Consume(SEMICOLON);
+        }
+
+        Expr? sideEffect = null;
+        if (!MatchesAny(RIGHT_PAREN))
+        {
+            sideEffect = Expression();
+            Consume(RIGHT_PAREN);
+        }
+
+        var body = Statement();
+
+        return new ForStatement(init, condition, sideEffect, body);
+    }
+
     private Statement IfStatement()
     {
         Consume(LEFT_PAREN);
@@ -105,9 +137,9 @@ public sealed partial class Parser
         var condition = Expression();
         Consume(RIGHT_PAREN);
 
-        var statement = Statement();
+        var body = Statement();
 
-        return new WhileStatement(condition, statement);
+        return new WhileStatement(condition, body);
     }
 
     private Statement ExpressionStatement()
