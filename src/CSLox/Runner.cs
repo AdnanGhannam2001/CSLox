@@ -39,7 +39,8 @@ public static class Runner
         }
         catch (FileNotFoundException exp)
         {
-            throw new LoxException("Failed to load script", exp.Message);
+            Logger.LogFatal("Failed to load script", exp.Message);
+            return;
         }
     }
 
@@ -47,12 +48,19 @@ public static class Runner
     {
         string? input;
 
-        do
+        while (true)
         {
             Console.Write("> ");
-            input = Console.ReadLine();
-            Run(input!);
+            if ((input = Console.ReadLine()) is null) break;
+
+            try
+            {
+                Run(input);
+            }
+            catch (LoxException exp)
+            {
+                Logger.LogError(exp.Message, exp.Details);
+            }
         }
-        while (!string.IsNullOrWhiteSpace(input));
     }
 }

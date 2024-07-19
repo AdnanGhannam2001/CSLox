@@ -153,6 +153,6 @@ public sealed class Scanner
 
     private void AddToken(TokenType type, object? literal = null)
     {
-        _tokens.Add(new Token(type, CurrentToken, literal, _line, _start, _current)); 
+        _tokens.Add(new Token(type, CurrentToken, literal, _line, _start/_line, _current/_line)); 
     }
 }

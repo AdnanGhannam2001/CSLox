@@ -93,8 +93,6 @@ public sealed partial class Parser
             init = MatchesAny(VAR) ? VarDeclaration() : ExpressionStatement();
         }
 
-        Console.WriteLine(1);
-
         Expr? condition = null;
         if (!MatchesAny(SEMICOLON))
         {
