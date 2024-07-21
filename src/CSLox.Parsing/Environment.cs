@@ -4,8 +4,6 @@ namespace CSLox.Parsing;
 
 public sealed partial class Parser
 {
-    internal static Environment s_environment = new();
-    
     internal class Environment
     {
         private readonly Dictionary<string, object?> _declarations = [];

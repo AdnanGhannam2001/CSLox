@@ -24,7 +24,7 @@ public abstract record Expr()
 
     public static bool Truthy(object obj)
     {
-        if (obj is Literal.NULL) return false;
+        if (obj is Literal.Null) return false;
         if (obj is bool b) return b;
         if (string.IsNullOrEmpty(obj.ToString())) return false;
         if (int.TryParse(obj.ToString(), out var i)) return i != 0;

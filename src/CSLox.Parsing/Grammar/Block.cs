@@ -7,7 +7,7 @@ public record Block(IList<Statement> Statements) : Statement
         Execute(Statements, new Parser.Environment(Parser.s_environment));
     }
 
-    private static void Execute(IList<Statement> statements, Parser.Environment environment)
+    internal static void Execute(IList<Statement> statements, Parser.Environment environment)
     {
         Parser.Environment prev = Parser.s_environment;
 

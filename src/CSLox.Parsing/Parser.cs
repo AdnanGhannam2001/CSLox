@@ -1,5 +1,6 @@
 ﻿using CSLox.Parsing.Exceptions;
 using CSLox.Parsing.Grammar;
+using CSLox.Parsing.NativeFunctions;
 using CSLox.Scanning;
 using CSLox.Scanning.Enums;
 using static CSLox.Scanning.Enums.TokenType;
@@ -8,6 +9,8 @@ namespace CSLox.Parsing;
 
 public sealed partial class Parser
 {
+    internal static Environment s_environment = NativeFunctionsFactory.Build();
+    
     private readonly IEnumerable<Token> _tokens;
     private int _current = 0;
     private Token CurrentToken => _tokens.ElementAt(_current);
@@ -32,17 +35,49 @@ public sealed partial class Parser
 
     private Statement Declaration()
     {
+        if (MatchesAny(FUN)) return FunctionDeclaration();
         if (MatchesAny(VAR)) return VarDeclaration();
 
         return Statement();
     }
 
+    private Statement FunctionDeclaration()
+    {
+        var identifier = Consume(IDENTIFIER);
+        var parameters = Parameters();
+        Consume(LEFT_BRACE);
+        var body = Block();
+
+        return new FunctionStatement(identifier, parameters, body);
+    }
+
+    private IList<Token> Parameters()
+    {
+        Consume(LEFT_PAREN);
+        var parameters = new List<Token>();
+
+        do 
+        {
+            if (parameters.Count >= Grammar.Call.MAX_ARGUMENTS)
+            {
+                throw new RuntimeException($"You can't define a function with too many parameters (max = {Grammar.Call.MAX_ARGUMENTS})");
+            }
+
+            if (!MatchesAny(RIGHT_PAREN))
+            {
+                parameters.Add(Consume(IDENTIFIER));
+            }
+        }
+        while (MatchesAny(COMMA));
+        MatchesAny(RIGHT_PAREN); // Consumes ')' if it was not consumed in the while loop
+
+        return parameters;
+    }
+
     private Statement VarDeclaration()
     {
         var identifier = Consume(IDENTIFIER);
-
         var initExpr = MatchesAny(EQUAL) ? Expression() : null;
-
         Consume(SEMICOLON);
 
         return new VarDeclaration(identifier, initExpr);
@@ -53,6 +88,7 @@ public sealed partial class Parser
         if (MatchesAny(FOR)) return ForStatement();
         if (MatchesAny(IF)) return IfStatement();
         if (MatchesAny(PRINT)) return PrintStatement();
+        if (MatchesAny(RETURN)) return ReturnStatement();
         if (MatchesAny(WHILE)) return WhileStatement();
         if (MatchesAny(LEFT_BRACE)) return new Block(Block());
 
@@ -64,6 +100,19 @@ public sealed partial class Parser
         var expr = Expression();
         Consume(SEMICOLON);
         return new PrintStatement(expr);
+    }
+
+    private Statement ReturnStatement()
+    {
+        Expr? expr = null;
+
+        if (!MatchesAny(SEMICOLON))
+        {
+            expr = Expression();
+            Consume(SEMICOLON);
+        }
+
+        return new ReturnStatement(expr);
     }
 
     private IList<Statement> Block()
@@ -266,7 +315,42 @@ public sealed partial class Parser
             return new Unary(op, exp);
         }
 
-        return Primary();
+        return Call();
+    }
+
+    private Expr Call()
+    {
+        var expr = Primary();
+
+        while (MatchesAny(LEFT_PAREN))
+        {
+            var arguments = Arguments();
+            expr = new Call(expr, arguments);
+        }
+
+        return expr;
+    }
+
+    private IList<Expr> Arguments()
+    {
+        var arguments = new List<Expr>();
+
+        do
+        {
+            if (arguments.Count >= Grammar.Call.MAX_ARGUMENTS)
+            {
+                throw new RuntimeException($"Can't have that much argument to a function (max = {Grammar.Call.MAX_ARGUMENTS})");
+            }
+
+            if (!MatchesAny(RIGHT_PAREN))
+            {
+                arguments.Add(Expression());
+            }
+        }
+        while (MatchesAny(COMMA));
+        MatchesAny(RIGHT_PAREN);
+
+        return arguments;
     }
 
     private Expr Primary()

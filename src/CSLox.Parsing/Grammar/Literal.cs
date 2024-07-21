@@ -4,7 +4,15 @@ namespace CSLox.Parsing.Grammar;
 
 public record Literal(object? Value) : Expr
 {
-    public struct NULL;
+    internal struct Null
+    {
+        public override string ToString()
+        {
+            return "nil";
+        }
+    }
+
+    internal static readonly Null NULL = new();
 
     internal override (int, string) Draw()
     {
@@ -24,6 +32,6 @@ public record Literal(object? Value) : Expr
 
     public override object Interpret()
     {
-        return Value ?? new NULL();
+        return Value ?? NULL;
     }
 }
