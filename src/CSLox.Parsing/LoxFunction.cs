@@ -7,9 +7,9 @@ namespace CSLox.Parsing;
 internal sealed class LoxFunction : ICallable
 {
     private readonly FunctionStatement _declaration;
-    private readonly Parser.Environment _environment;
+    private readonly Interpreting.Environment _environment;
 
-    public LoxFunction(FunctionStatement declaration, Parser.Environment environment)
+    public LoxFunction(FunctionStatement declaration, Interpreting.Environment environment)
     {
         _declaration = declaration;
         _environment = environment;
@@ -19,7 +19,7 @@ internal sealed class LoxFunction : ICallable
     {
         ((ICallable) this).CheckArity(_declaration.Parameters.Count, arguments.Count);
 
-        var environment = new Parser.Environment(_environment);
+        var environment = new Interpreting.Environment(_environment);
 
         for (var i = 0; i < arguments.Count; ++i)
         {

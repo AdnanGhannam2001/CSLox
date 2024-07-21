@@ -1,3 +1,4 @@
+using CSLox.Parsing.Interpreting;
 using CSLox.Scanning;
 
 namespace CSLox.Parsing.Grammar;
@@ -7,7 +8,7 @@ public record Assignment(Token Name, Expr Value) : Expr
     public override object Interpret()
     {
         var value = Value.Interpret();
-        Parser.s_environment.Assign(Name.Lexeme, Value.Interpret());
+        Interpreter.Environment.Assign(Name.Lexeme, Value.Interpret());
         return value;
     }
 

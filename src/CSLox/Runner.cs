@@ -1,6 +1,7 @@
 using CSLox.Core.Common;
 using CSLox.Core.Exceptions;
 using CSLox.Parsing;
+using CSLox.Parsing.Interpreting;
 using CSLox.Scanning;
 
 namespace CSLox;
@@ -24,10 +25,8 @@ public static class Runner
         }
 #endif
 
-        foreach (var statement in program)
-        {
-            statement.Interpret();
-        }
+        // Interpreting
+        Interpreter.Interpret(program);
     }
 
     public static void RunFile(string path)

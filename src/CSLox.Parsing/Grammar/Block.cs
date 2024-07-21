@@ -1,17 +1,18 @@
+using CSLox.Parsing.Interpreting;
+
 namespace CSLox.Parsing.Grammar;
 
 public record Block(IList<Statement> Statements) : Statement
 {
     public override void Interpret()
     {
-        Execute(Statements, new Parser.Environment(Parser.s_environment));
+        Execute(Statements, new Interpreting.Environment(Interpreter.Environment));
     }
 
-    internal static void Execute(IList<Statement> statements, Parser.Environment environment)
+    internal static void Execute(IList<Statement> statements, Interpreting.Environment environment)
     {
-        Parser.Environment prev = Parser.s_environment;
-
-        Parser.s_environment = environment;
+        var prev = Interpreter.Environment;
+        Interpreter.Environment = environment;
 
         try
         {
@@ -22,7 +23,7 @@ public record Block(IList<Statement> Statements) : Statement
         }
         finally
         {
-            Parser.s_environment = prev;
+            Interpreter.Environment = prev;
         }
     }
 }

@@ -1,16 +1,13 @@
 ﻿using CSLox.Parsing.Exceptions;
 using CSLox.Parsing.Grammar;
-using CSLox.Parsing.NativeFunctions;
 using CSLox.Scanning;
 using CSLox.Scanning.Enums;
 using static CSLox.Scanning.Enums.TokenType;
 
 namespace CSLox.Parsing;
 
-public sealed partial class Parser
+public sealed class Parser
 {
-    internal static Environment s_environment = NativeFunctionsFactory.Build();
-    
     private readonly IEnumerable<Token> _tokens;
     private int _current = 0;
     private Token CurrentToken => _tokens.ElementAt(_current);

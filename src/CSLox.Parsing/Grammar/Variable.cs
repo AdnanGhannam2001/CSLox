@@ -1,4 +1,5 @@
 using System.Text;
+using CSLox.Parsing.Interpreting;
 using CSLox.Scanning;
 
 namespace CSLox.Parsing.Grammar;
@@ -7,7 +8,7 @@ public record Variable(Token Identifier) : Expr
 {
     public override object Interpret()
     {
-        return Parser.s_environment.GetVariableValue(Identifier.Lexeme)!;
+        return Interpreter.Environment.GetVariableValue(Identifier.Lexeme)!;
     }
 
     internal override (int counter, string content) Draw()

@@ -2,12 +2,10 @@ namespace CSLox.Parsing.NativeFunctions;
 
 internal static class NativeFunctionsFactory
 {
-    public static Parser.Environment Build()
+    public static Interpreting.Environment Build()
     {
-        var environment = new Parser.Environment();
-
+        var environment = new Interpreting.Environment();
         environment.Decalare("clock", new ClockFunction());
-
         return environment;
     }
 }
