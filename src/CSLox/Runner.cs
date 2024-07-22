@@ -49,12 +49,16 @@ public static class Runner
 
     public static void RunPrompt()
     {
+        ReadLine.HistoryEnabled = true;
         string? input;
 
         while (true)
         {
-            Console.Write("> ");
-            if ((input = Console.ReadLine()) is null) break;
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("(prompt)> ");
+            Console.ResetColor();
+
+            input = ReadLine.Read();
 
             try
             {
