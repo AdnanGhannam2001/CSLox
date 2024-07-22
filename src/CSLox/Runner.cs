@@ -2,6 +2,7 @@ using CSLox.Core.Common;
 using CSLox.Core.Exceptions;
 using CSLox.Parsing;
 using CSLox.Parsing.Interpreting;
+using CSLox.Parsing.Resolving;
 using CSLox.Scanning;
 
 namespace CSLox;
@@ -24,6 +25,9 @@ public static class Runner
             Logger.LogMessage(token.ToString());
         }
 #endif
+
+        // Resolving
+        Resolver.Resolve(program);
 
         // Interpreting
         Interpreter.Interpret(program);

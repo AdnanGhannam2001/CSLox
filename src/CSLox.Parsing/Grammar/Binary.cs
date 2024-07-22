@@ -8,6 +8,12 @@ namespace CSLox.Parsing.Grammar;
 
 public record Binary(Expr LeftExpression, Token Operator, Expr RightExpression) : Expr
 {
+    public override void Resolve()
+    {
+        LeftExpression.Resolve();
+        RightExpression.Resolve();
+    }
+
     internal override (int, string) Draw()
     {
         var currentCounter = ++s_counter;

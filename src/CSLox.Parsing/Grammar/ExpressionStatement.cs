@@ -6,6 +6,11 @@ namespace CSLox.Parsing.Grammar;
 
 public record ExpressionStatement(Expr Expression) : Statement
 {
+    public override void Resolve()
+    {
+        Expression.Resolve();
+    }
+
     public override void Interpret()
     {
         Expression.Interpret();

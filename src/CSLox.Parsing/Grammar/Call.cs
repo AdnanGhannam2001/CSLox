@@ -7,6 +7,15 @@ public record Call(Expr Callee, IList<Expr> Arguments) : Expr
 {
     public const int MAX_ARGUMENTS = byte.MaxValue;
 
+    public override void Resolve()
+    {
+        Callee.Resolve();
+        foreach (var argument in Arguments)
+        {
+            argument.Resolve();
+        }
+    }
+
     public override object Interpret()
     {
         var callee = Callee.Interpret();

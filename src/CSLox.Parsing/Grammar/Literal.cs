@@ -14,6 +14,8 @@ public record Literal(object? Value) : Expr
 
     internal static readonly Null NULL = new();
 
+    public override void Resolve() { }
+
     internal override (int, string) Draw()
     {
         s_counter++;

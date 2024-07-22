@@ -1,14 +1,21 @@
 using CSLox.Parsing.Interpreting;
+using CSLox.Parsing.Resolving;
 using CSLox.Scanning;
 
 namespace CSLox.Parsing.Grammar;
 
 public record Assignment(Token Name, Expr Value) : Expr
 {
+    public override void Resolve()
+    {
+        Value.Resolve();
+        Resolver.ResolveLocalVariable(this, Name);
+    }
+
     public override object Interpret()
     {
         var value = Value.Interpret();
-        Interpreter.Environment.Assign(Name.Lexeme, Value.Interpret());
+        Interpreter.SetVariable(Name.Lexeme, Value.Interpret(), this);
         return value;
     }
 

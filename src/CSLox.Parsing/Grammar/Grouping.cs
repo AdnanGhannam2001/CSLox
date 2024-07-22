@@ -4,6 +4,11 @@ namespace CSLox.Parsing.Grammar;
 
 public record Grouping(Expr Expression) : Expr
 {
+    public override void Resolve()
+    {
+        Expression.Resolve();
+    }
+
     internal override (int, string) Draw()
     {
         var currentCounter = ++s_counter;

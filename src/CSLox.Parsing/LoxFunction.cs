@@ -23,7 +23,7 @@ internal sealed class LoxFunction : ICallable
 
         for (var i = 0; i < arguments.Count; ++i)
         {
-            environment.Decalare(_declaration.Parameters[i].Lexeme, arguments[i]);
+            environment.Declare(_declaration.Parameters[i].Lexeme, arguments[i]);
         }
 
         try

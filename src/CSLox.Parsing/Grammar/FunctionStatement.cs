@@ -1,13 +1,33 @@
 using CSLox.Parsing.Interpreting;
+using CSLox.Parsing.Resolving;
 using CSLox.Scanning;
 
 namespace CSLox.Parsing.Grammar;
 
 public record FunctionStatement(Token Name, IList<Token> Parameters, IList<Statement> Body) : Statement
 {
+    public override void Resolve()
+    {
+        var type = Resolver.CurrentScopeType;
+        Resolver.CurrentScopeType = Enums.ScopeType.Function;
+        Resolver.Declare(Name.Lexeme);
+        Resolver.Define(Name.Lexeme);
+
+        Resolver.BeginScope();
+            foreach (var param in Parameters)
+            {
+                Resolver.Declare(param.Lexeme);
+                Resolver.Define(param.Lexeme);
+            }
+        Resolver.EndScope();
+
+        Resolver.Resolve(Body);
+        Resolver.CurrentScopeType = type;
+    }
+
     public override void Interpret()
     {
         var function = new LoxFunction(this, Interpreter.Environment);
-        Interpreter.Environment.Decalare(Name.Lexeme, function);
+        Interpreter.Environment.Declare(Name.Lexeme, function);
     }
 }

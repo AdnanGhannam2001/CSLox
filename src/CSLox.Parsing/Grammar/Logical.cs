@@ -5,6 +5,12 @@ namespace CSLox.Parsing.Grammar;
 
 public record Logical(Expr Left, Token Operator, Expr Right) : Expr
 {
+    public override void Resolve()
+    {
+        Left.Resolve();
+        Right.Resolve();
+    }
+
     public override object Interpret()
     {
         var left = Left.Interpret();

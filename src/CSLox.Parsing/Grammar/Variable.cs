@@ -1,14 +1,28 @@
 using System.Text;
+using CSLox.Core.Common;
+using CSLox.Core.Exceptions;
 using CSLox.Parsing.Interpreting;
+using CSLox.Parsing.Resolving;
 using CSLox.Scanning;
 
 namespace CSLox.Parsing.Grammar;
 
 public record Variable(Token Identifier) : Expr
 {
+    public override void Resolve()
+    {
+        if (Resolver.NotInitialized(Identifier.Lexeme))
+        {
+            Logger.LogError("Invalid access", $"Trying to access an uninitialized variable '{Identifier.Lexeme}'");
+            return;
+        }
+
+        Resolver.ResolveLocalVariable(this, Identifier);
+    }
+
     public override object Interpret()
     {
-        return Interpreter.Environment.GetVariableValue(Identifier.Lexeme)!;
+        return Interpreter.GetVariable(Identifier.Lexeme, this);
     }
 
     internal override (int counter, string content) Draw()

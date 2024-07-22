@@ -14,7 +14,7 @@ internal class Environment
         m_environment = environment;
     }
 
-    public void Decalare(string name, object? value)
+    public void Declare(string name, object? value)
     {
         if (_declarations.ContainsKey(name))
         {
@@ -42,12 +42,31 @@ internal class Environment
         throw new RuntimeException($"Undefined variable named: {name}");
     }
 
+    public void Assign(string name, object value, int distance)
+    {
+        Environment environment = this;
+        for (var i = 0; i < distance; ++i)
+        {
+            environment = environment.m_environment!;
+        }
+        environment.Assign(name, value);
+    }
+
     public object? GetVariableValue(string name)
     {
         if (_declarations.TryGetValue(name, out var value)) return value;
-
         if (m_environment is not null) return m_environment.GetVariableValue(name);
 
         throw new RuntimeException($"Undefined variable named: '{name}'");
+    }
+
+    public object GetVariableValue(string name, int distance)
+    {
+        Environment environment = this;
+        for (var i = 0; i < distance; ++i)
+        {
+            environment = environment.m_environment!;
+        }
+        return environment.GetVariableValue(name)!;
     }
 }
