@@ -120,8 +120,9 @@ public sealed class Scanner
 
         if (IsAtEnd) throw new ScannerException(CurrentToken, _line, _start, _current);
 
-        _current++;
+        _start++;
         AddToken(STRING, CurrentToken);
+        _current++;
     }
 
     private void ScanNumber()
