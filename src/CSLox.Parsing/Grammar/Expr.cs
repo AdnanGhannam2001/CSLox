@@ -32,5 +32,5 @@ public abstract record Expr()
         return true;
     }
 
-    public override int GetHashCode() => base.GetHashCode() ^ 9;
+    public override int GetHashCode() => base.GetHashCode() ^ 11;
 }

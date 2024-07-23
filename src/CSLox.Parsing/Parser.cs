@@ -32,10 +32,27 @@ public sealed class Parser
 
     private Statement Declaration()
     {
+        if (MatchesAny(CLASS)) return ClassDeclaration();
         if (MatchesAny(FUN)) return FunctionDeclaration();
         if (MatchesAny(VAR)) return VarDeclaration();
 
         return Statement();
+    }
+
+    private Statement ClassDeclaration()
+    {
+        var name = Consume(IDENTIFIER);
+        Consume(LEFT_BRACE);
+
+        var functions = new List<Statement>();
+        while (MatchesAny(FUN))
+        {
+            functions.Add(FunctionDeclaration());
+        }
+        
+        Consume(RIGHT_BRACE);
+
+        return new ClassStatement(name, functions);
     }
 
     private Statement FunctionDeclaration()
@@ -206,14 +223,16 @@ public sealed class Parser
         {
             var assignment = Assignment();
 
-            var variable = expr as Variable;
-
-            if (variable is null)
+            if (expr is Variable variable)
             {
-                throw new RuntimeException("Invalid assignment");
+                return new Assignment(variable.Identifier, assignment);
+            }
+            else if (expr is Get getExpr)
+            {
+                return new Set(getExpr.Object, getExpr.Field, assignment);
             }
 
-            return new Assignment(variable.Identifier, assignment);
+            throw new RuntimeException("Invalid assignment");
         }
 
         return expr;
@@ -319,10 +338,22 @@ public sealed class Parser
     {
         var expr = Primary();
 
-        while (MatchesAny(LEFT_PAREN))
+        while (true)
         {
-            var arguments = Arguments();
-            expr = new Call(expr, arguments);
+            if (MatchesAny(LEFT_PAREN))
+            {
+                var arguments = Arguments();
+                expr = new Call(expr, arguments);
+            }
+            else if (MatchesAny(DOT))
+            {
+                var field = Consume(IDENTIFIER);
+                expr = new Get(expr, field);
+            }
+            else
+            {
+                break;
+            }
         }
 
         return expr;

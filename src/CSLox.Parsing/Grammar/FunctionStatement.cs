@@ -19,9 +19,8 @@ public record FunctionStatement(Token Name, IList<Token> Parameters, IList<State
                 Resolver.Declare(param.Lexeme);
                 Resolver.Define(param.Lexeme);
             }
+            Resolver.Resolve(Body);
         Resolver.EndScope();
-
-        Resolver.Resolve(Body);
         Resolver.CurrentScopeType = type;
     }
 
