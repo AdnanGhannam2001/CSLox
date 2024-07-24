@@ -34,7 +34,7 @@ public static class Logger
 
         if (details is not null)
         {
-            Write($"{NewLine}\t{details}");
+            Write($"{NewLine}\t{details.Replace("\n", "\n\t")}");
         }
 
         Write(NewLine);

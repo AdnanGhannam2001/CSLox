@@ -11,7 +11,7 @@ public sealed class Scanner
     private readonly List<Token> _tokens = [];
 
     private int _line = 1;
-    // TODO: fix this
+    private int _lineStartsAt = 0;
     private int _start = 0;
     private int _current = 0;
 
@@ -33,7 +33,7 @@ public sealed class Scanner
         }
 
         _start = _current;
-        _tokens.Add(new Token(EOF, "", null, _line, _start, _current));
+        AddToken(EOF, null);
 
         return _tokens;
     }
@@ -60,7 +60,7 @@ public sealed class Scanner
                 if (Next == '/')
                 {
                     while (!IsAtEnd && _source[_current++] != '\n');
-                    _line++;
+                    NewLine();
                 }
                 else AddToken(SLASH);
             }
@@ -69,8 +69,9 @@ public sealed class Scanner
             case ' ':
             case '\t':
             case '\r':
+                _start++;
                 break;
-            case '\n': { _line++; } break;
+            case '\n': { NewLine(); } break;
 
             case '!': { AddToken(NextMatches('=') ? BANG_EQUAL : BANG);       } break;
             case '=': { AddToken(NextMatches('=') ? EQUAL_EQUAL : EQUAL);     } break;
@@ -97,6 +98,16 @@ public sealed class Scanner
         }
     }
 
+    private static bool IsDigit(char c) => c >= '0' && c <= '9';
+    private static bool IsAlpha(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    private static bool IsAlphaNumeric(char c) => IsDigit(c) || IsAlpha(c);
+
+    private void NewLine()
+    {
+        _line++;
+        _lineStartsAt = _start;
+    }
+
     private bool NextMatches(char c)
     {
         if (IsAtEnd || Next != c) return false;
@@ -104,10 +115,6 @@ public sealed class Scanner
         _current++;
         return true;
     }
-
-    private static bool IsDigit(char c) => c >= '0' && c <= '9';
-    private static bool IsAlpha(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
-    private static bool IsAlphaNumeric(char c) => IsDigit(c) || IsAlpha(c);
 
     private void ScanString()
     {
@@ -154,6 +161,7 @@ public sealed class Scanner
 
     private void AddToken(TokenType type, object? literal = null)
     {
-        _tokens.Add(new Token(type, CurrentToken, literal, _line, _start/_line, _current/_line)); 
+        _tokens.Add(new Token(
+                type, CurrentToken, literal, _line, _start - _lineStartsAt, _start, _current - _start)); 
     }
 }

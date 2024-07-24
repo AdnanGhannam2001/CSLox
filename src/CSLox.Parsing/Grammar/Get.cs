@@ -17,7 +17,7 @@ public record Get(Expr Object, Token Field) : Expr
 
         return @object.Get(Field.Lexeme)
             ?? throw new RuntimeException(
-                $"Unknown field or method: '{Field.Lexeme}' at line: {Field.Line}, columns: {Field.Start}-{Field.End}");
+                $"Unknown field or method: '{Field.Lexeme}' at line: {Field.Line}, columns: {Field.Start}-{Field.Length + Field.Start}");
     }
 
     internal override (int counter, string content) Draw()

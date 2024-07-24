@@ -8,20 +8,21 @@ namespace CSLox.Parsing;
 
 public sealed class Parser
 {
+    private readonly string _content;
     private readonly IEnumerable<Token> _tokens;
     private int _current = 0;
     private Token CurrentToken => _tokens.ElementAt(_current);
     private bool IsAtEnd => CurrentToken.Type == EOF;
 
-    public Parser(IEnumerable<Token> tokens)
+    public Parser(string content, IEnumerable<Token> tokens)
     {
+        _content = content;
         _tokens = tokens;
     }
 
     public IEnumerable<Statement> Parse()
     {
         var statements = new List<Statement>();
-
         while (!IsAtEnd)
         {
             statements.Add(Declaration());
@@ -45,7 +46,7 @@ public sealed class Parser
         Consume(LEFT_BRACE);
 
         var functions = new List<FunctionStatement>();
-        while (MatchesAny(FUN))
+        while (TokenTypeEquals(IDENTIFIER))
         {
             functions.Add(FunctionDeclaration());
         }
@@ -68,7 +69,6 @@ public sealed class Parser
     {
         Consume(LEFT_PAREN);
         var parameters = new List<Token>();
-
         do 
         {
             if (parameters.Count >= Grammar.Call.MAX_ARGUMENTS)
@@ -76,13 +76,13 @@ public sealed class Parser
                 throw new RuntimeException($"You can't define a function with too many parameters (max = {Grammar.Call.MAX_ARGUMENTS})");
             }
 
-            if (!MatchesAny(RIGHT_PAREN))
+            if (!TokenTypeEquals(RIGHT_PAREN))
             {
                 parameters.Add(Consume(IDENTIFIER));
             }
         }
         while (MatchesAny(COMMA));
-        MatchesAny(RIGHT_PAREN); // Consumes ')' if it was not consumed in the while loop
+        Consume(RIGHT_PAREN); // Consumes ')'
 
         return parameters;
     }
@@ -112,13 +112,13 @@ public sealed class Parser
     {
         var expr = Expression();
         Consume(SEMICOLON);
+
         return new PrintStatement(expr);
     }
 
     private Statement ReturnStatement()
     {
         Expr? expr = null;
-
         if (!MatchesAny(SEMICOLON))
         {
             expr = Expression();
@@ -131,12 +131,11 @@ public sealed class Parser
     private IList<Statement> Block()
     {
         var statements = new List<Statement>();
-
         while (!MatchesAny(RIGHT_BRACE))
         {
             if (IsAtEnd)
             {
-                throw new RuntimeException("Excpected '}'");
+                throw new RuntimeException("Expected '}'");
             }
 
             statements.Add(Declaration());
@@ -361,7 +360,6 @@ public sealed class Parser
     private IList<Expr> Arguments()
     {
         var arguments = new List<Expr>();
-
         do
         {
             if (arguments.Count >= Grammar.Call.MAX_ARGUMENTS)
@@ -369,13 +367,13 @@ public sealed class Parser
                 throw new RuntimeException($"Can't have that much argument to a function (max = {Grammar.Call.MAX_ARGUMENTS})");
             }
 
-            if (!TypeEquals(RIGHT_PAREN))
+            if (!TokenTypeEquals(RIGHT_PAREN))
             {
                 arguments.Add(Expression());
             }
         }
         while (MatchesAny(COMMA));
-        Consume(RIGHT_PAREN);
+        Consume(RIGHT_PAREN); // Consumes ')'
 
         return arguments;
     }
@@ -386,24 +384,21 @@ public sealed class Parser
         if (MatchesAny(FALSE)) return new Literal(false);
         if (MatchesAny(NIL)) return new Literal(null);
         if (MatchesAny(NUMBER) || MatchesAny(STRING)) return new Literal(_tokens.ElementAt(_current - 1).Literal!);
-
         if (MatchesAny(LEFT_PAREN))
         {
             var expr = Expression();
             Consume(RIGHT_PAREN);
             return new Grouping(expr);
         }
-
-        if (TypeEquals(THIS)) return new This(Consume(THIS));
-
+        if (TokenTypeEquals(THIS)) return new This(Consume(THIS));
         if (MatchesAny(IDENTIFIER)) return new Variable(_tokens.ElementAt(_current - 1));
 
-        throw new UnexpectedTokenException(CurrentToken, "Excpected expression");
+        throw new UnexpectedTokenException(_content, CurrentToken, "expression");
     }
 
     private bool MatchesAny(params TokenType[] types)
     {
-        if (types.Any(TypeEquals))
+        if (types.Any(TokenTypeEquals))
         {
             _current++;
             return true;
@@ -412,17 +407,17 @@ public sealed class Parser
         return false;
     }
 
-    private bool TypeEquals(TokenType type)
+    private bool TokenTypeEquals(TokenType type)
     {
         if (IsAtEnd) return false;
 
         return CurrentToken.Type == type;
     }
 
-    private Token Consume(TokenType type)
+    private Token Consume(TokenType type, string? expected = null)
     {
         if (MatchesAny(type)) return _tokens.ElementAt(_current - 1);
 
-        throw new UnexpectedTokenException(CurrentToken, $"Excpected {type} at the end");
+        throw new UnexpectedTokenException(_content, CurrentToken, expected ?? type.ToString());
     }
 }

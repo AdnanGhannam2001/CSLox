@@ -16,7 +16,7 @@ public static class Runner
         var tokens = scanner.ScanTokens();
 
         // Parsing
-        var parser = new Parser(tokens);
+        var parser = new Parser(source, tokens);
         var program = parser.Parse();
 
 #if PRINT_TOKENS
