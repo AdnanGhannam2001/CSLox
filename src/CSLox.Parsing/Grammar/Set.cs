@@ -15,7 +15,7 @@ public record Set(Expr Object, Token Field, Expr Value) : Expr
     {
         var @object = Object.Interpret() as LoxObject
             ?? throw new RuntimeException("Only objects has fields");
-        @object.SetField(Field.Lexeme, Value.Interpret());
+        @object.Set(Field.Lexeme, Value.Interpret());
 
         return Value;
     }

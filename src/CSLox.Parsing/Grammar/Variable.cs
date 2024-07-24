@@ -1,6 +1,5 @@
 using System.Text;
 using CSLox.Core.Common;
-using CSLox.Core.Exceptions;
 using CSLox.Parsing.Interpreting;
 using CSLox.Parsing.Resolving;
 using CSLox.Scanning;

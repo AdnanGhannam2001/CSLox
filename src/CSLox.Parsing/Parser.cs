@@ -44,18 +44,17 @@ public sealed class Parser
         var name = Consume(IDENTIFIER);
         Consume(LEFT_BRACE);
 
-        var functions = new List<Statement>();
+        var functions = new List<FunctionStatement>();
         while (MatchesAny(FUN))
         {
             functions.Add(FunctionDeclaration());
         }
-        
         Consume(RIGHT_BRACE);
 
         return new ClassStatement(name, functions);
     }
 
-    private Statement FunctionDeclaration()
+    private FunctionStatement FunctionDeclaration()
     {
         var identifier = Consume(IDENTIFIER);
         var parameters = Parameters();
@@ -370,13 +369,13 @@ public sealed class Parser
                 throw new RuntimeException($"Can't have that much argument to a function (max = {Grammar.Call.MAX_ARGUMENTS})");
             }
 
-            if (!MatchesAny(RIGHT_PAREN))
+            if (!TypeEquals(RIGHT_PAREN))
             {
                 arguments.Add(Expression());
             }
         }
         while (MatchesAny(COMMA));
-        MatchesAny(RIGHT_PAREN);
+        Consume(RIGHT_PAREN);
 
         return arguments;
     }
@@ -394,6 +393,8 @@ public sealed class Parser
             Consume(RIGHT_PAREN);
             return new Grouping(expr);
         }
+
+        if (TypeEquals(THIS)) return new This(Consume(THIS));
 
         if (MatchesAny(IDENTIFIER)) return new Variable(_tokens.ElementAt(_current - 1));
 

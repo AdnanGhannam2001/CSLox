@@ -4,12 +4,16 @@ internal sealed record LoxObject(LoxClass Class)
 {
     private readonly Dictionary<string, object> _fields = [];
 
-    public object? GetField(string name)
+    public object? Get(string name)
     {
-        return _fields.GetValueOrDefault(name);
+        var field = _fields.GetValueOrDefault(name);
+
+        return field is not null
+            ? field
+            : (Class.Methods.GetValueOrDefault(name)?.Bind(this));
     }
 
-    public void SetField(string name, object value)
+    public void Set(string name, object value)
     {
         _fields[name] = value;
     }

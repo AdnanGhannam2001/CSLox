@@ -9,7 +9,7 @@ public record FunctionStatement(Token Name, IList<Token> Parameters, IList<State
     public override void Resolve()
     {
         var type = Resolver.CurrentScopeType;
-        Resolver.CurrentScopeType = Enums.ScopeType.Function;
+        if (type != Enums.ScopeType.Method) Resolver.CurrentScopeType = Enums.ScopeType.Function;
         Resolver.Declare(Name.Lexeme);
         Resolver.Define(Name.Lexeme);
 

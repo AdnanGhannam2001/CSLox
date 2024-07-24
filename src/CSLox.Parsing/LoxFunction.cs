@@ -20,7 +20,6 @@ internal sealed class LoxFunction : ICallable
         ((ICallable) this).CheckArity(_declaration.Parameters.Count, arguments.Count);
 
         var environment = new Interpreting.Environment(_environment);
-
         for (var i = 0; i < arguments.Count; ++i)
         {
             environment.Declare(_declaration.Parameters[i].Lexeme, arguments[i]);
@@ -35,6 +34,13 @@ internal sealed class LoxFunction : ICallable
         {
             return exp.Value;
         }
+    }
+
+    public LoxFunction Bind(LoxObject @object)
+    {
+        var environment = new Interpreting.Environment(_environment);
+        environment.Declare("this", @object);
+        return new (_declaration, environment);
     }
 
     public override string ToString()

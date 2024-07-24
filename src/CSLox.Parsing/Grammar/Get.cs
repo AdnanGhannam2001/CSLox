@@ -15,9 +15,9 @@ public record Get(Expr Object, Token Field) : Expr
         var @object = Object.Interpret() as LoxObject ??
             throw new RuntimeException("Only objects has fields");
 
-        return @object.GetField(Field.Lexeme)
+        return @object.Get(Field.Lexeme)
             ?? throw new RuntimeException(
-                $"Unknown field '{Field.Lexeme}' at line: {Field.Line}, columns: {Field.Start}-{Field.End}");
+                $"Unknown field or method: '{Field.Lexeme}' at line: {Field.Line}, columns: {Field.Start}-{Field.End}");
     }
 
     internal override (int counter, string content) Draw()

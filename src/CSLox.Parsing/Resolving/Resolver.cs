@@ -39,7 +39,7 @@ public static class Resolver
         {
             if (Scopes.ElementAt(i).ContainsKey(name.Lexeme))
             {
-                Interpreter.Resolve(expression, Scopes.Count - i - 1);
+                Interpreter.Resolve(expression, i);
                 return;
             }
         }
