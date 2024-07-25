@@ -6,11 +6,14 @@ namespace CSLox.Parsing;
 internal sealed class LoxClass : ICallable
 {
     private readonly string _name;
+    internal readonly LoxClass? SuperClass;
+
     internal readonly Dictionary<string, LoxFunction> Methods;
 
-    public LoxClass(string name, Dictionary<string, LoxFunction> methods)
+    public LoxClass(string name, LoxClass? superClass, Dictionary<string, LoxFunction> methods)
     {
         _name = name;
+        SuperClass = superClass;
         Methods = methods;
     }
 

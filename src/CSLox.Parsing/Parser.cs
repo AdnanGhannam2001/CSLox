@@ -43,6 +43,13 @@ public sealed class Parser
     private Statement ClassDeclaration()
     {
         var name = Consume(IDENTIFIER);
+
+        Variable? superClass = null;
+        if (MatchesAny(LESS))
+        {
+            superClass = new (Consume(IDENTIFIER));
+        }
+
         Consume(LEFT_BRACE);
 
         var functions = new List<FunctionStatement>();
@@ -52,7 +59,7 @@ public sealed class Parser
         }
         Consume(RIGHT_BRACE);
 
-        return new ClassStatement(name, functions);
+        return new ClassStatement(name, superClass, functions);
     }
 
     private FunctionStatement FunctionDeclaration()
@@ -389,6 +396,13 @@ public sealed class Parser
             var expr = Expression();
             Consume(RIGHT_PAREN);
             return new Grouping(expr);
+        }
+        if (TokenTypeEquals(SUPER))
+        {
+            var keyword = Consume(SUPER);
+            Consume(DOT);
+            var method = Consume(IDENTIFIER);
+            return new Super(keyword, method);
         }
         if (TokenTypeEquals(THIS)) return new This(Consume(THIS));
         if (MatchesAny(IDENTIFIER)) return new Variable(_tokens.ElementAt(_current - 1));

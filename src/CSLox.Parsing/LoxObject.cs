@@ -7,10 +7,18 @@ internal sealed record LoxObject(LoxClass Class)
     public object? Get(string name)
     {
         var field = _fields.GetValueOrDefault(name);
+        if (field is not null)
+        {
+            return field;
+        }
 
-        return field is not null
-            ? field
-            : (Class.Methods.GetValueOrDefault(name)?.Bind(this));
+        var method = Class.Methods.GetValueOrDefault(name)?.Bind(this);
+        if (method is not null)
+        {
+            return method;
+        }
+
+        return Class.SuperClass?.Methods.GetValueOrDefault(name);
     }
 
     public void Set(string name, object value)
