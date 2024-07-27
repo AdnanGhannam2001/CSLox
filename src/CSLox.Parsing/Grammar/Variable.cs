@@ -34,7 +34,7 @@ public record Variable(Token Identifier) : Expr
             sb.Append("color=green;");
             sb.Append("node[style=filled];");
             sb.Append($"label=\"Identifier\";");
-            sb.Append($"expr_{s_counter}[label=\"{Identifier}\"];");
+            sb.Append($"expr_{s_counter}[label=\"{Identifier.Lexeme}\"];");
         sb.Append('}');
 
         return (s_counter, sb.ToString());

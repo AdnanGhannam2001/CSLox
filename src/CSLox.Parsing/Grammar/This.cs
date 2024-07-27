@@ -1,3 +1,4 @@
+using System.Text;
 using CSLox.Core.Exceptions;
 using CSLox.Parsing.Interpreting;
 using CSLox.Parsing.Resolving;
@@ -24,7 +25,17 @@ public record This(Token Keyword) : Expr
 
     internal override (int counter, string content) Draw()
     {
-        // TODO
-        throw new NotImplementedException();
+        s_counter++;
+        var sb = new StringBuilder();
+
+        sb.Append($"subgraph cluster_{s_counter}");
+        sb.Append('{');
+            sb.Append("color=green;");
+            sb.Append("node[style=filled];");
+            sb.Append($"label=\"This\";");
+            sb.Append($"expr_{s_counter}[label=\"this\"];");
+        sb.Append('}');
+
+        return (s_counter, sb.ToString());
     }
 }

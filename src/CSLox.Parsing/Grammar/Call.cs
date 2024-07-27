@@ -1,3 +1,4 @@
+using System.Text;
 using CSLox.Parsing.Exceptions;
 using CSLox.Parsing.Interfaces;
 
@@ -37,7 +38,39 @@ public record Call(Expr Callee, IList<Expr> Arguments) : Expr
 
     internal override (int counter, string content) Draw()
     {
-        // TODO
-        throw new NotImplementedException();
+        var currentCounter = ++s_counter;
+
+        var sb = new StringBuilder();
+
+        sb.Append($"subgraph cluster_{s_counter}");
+        sb.Append('{');
+            sb.Append($"label=\"Call\";");
+            sb.Append($"expr_{s_counter}[label=\"()\"];");
+
+            var (calleeExprCounter, calleeContent) = Callee.Draw();
+            sb.Append($"expr_{currentCounter}->expr_{calleeExprCounter};");
+            sb.Append(calleeContent);
+
+            sb.Append($"expr_{currentCounter}->expr_{s_counter + 1};");
+            currentCounter = ++s_counter;
+            sb.Append($"subgraph cluster_{currentCounter}");
+            sb.Append('{');
+                sb.Append("color=green;");
+                sb.Append("node[style=filled];");
+                sb.Append($"label=\"Arguments\";");
+                sb.Append($"expr_{currentCounter}[label=\"[]\"];");
+
+                var oldCounter = currentCounter;
+                foreach (var arg in Arguments)
+                {
+                    currentCounter = ++s_counter;
+                    var (argExprCounter, argContent) = arg.Draw();
+                    sb.Append($"expr_{oldCounter}->expr_{argExprCounter};");
+                    sb.Append(argContent);
+                }
+            sb.Append('}');
+        sb.Append('}');
+
+        return (currentCounter, sb.ToString());
     }
 }
