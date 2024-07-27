@@ -40,7 +40,7 @@ $ ./scripts/run.sh -p:DefineConstants=PRINT_AST
 
 then you can go to [`this website`](https://dreampuf.github.io/GraphvizOnline) and past the digraph in, and you will get this result:
 
-![ast](assets/ast-1.svg)
+![ast](assets/ast-1.png)
 
 #### Example 2
 
@@ -54,4 +54,4 @@ $ ./scripts/run.sh -p:DefineConstants=PRINT_AST
 (prompt)> 
 ```
 
-![ast](assets/ast-2.svg)
+![ast](assets/ast-2.png)
